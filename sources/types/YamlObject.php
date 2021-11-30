@@ -1,5 +1,11 @@
 <?php
+
 namespace Dallgoot\Yaml;
+
+use ArrayIterator;
+use Exception;
+use JsonSerializable;
+use UnexpectedValueException;
 
 /**
  *  The returned object representing a YAML document
@@ -8,15 +14,14 @@ namespace Dallgoot\Yaml;
  * @license Apache 2.0
  * @link    https://github.com/dallgoot/yaml
  */
-class YamlObject extends \ArrayIterator implements \JsonSerializable
+class YamlObject extends ArrayIterator implements JsonSerializable
 {
+    const UNDEFINED_METHOD = self::class . ": undefined method '%s', valid methods are (addReference,getReference,getAllReferences,addComment,getComment,setText,addTag,hasDocStart,isTagged)";
+    const UNKNOWN_REFERENCE = "no reference named: '%s', known are : (%s)";
+    const UNAMED_REFERENCE = "reference MUST have a name";
+    const TAGHANDLE_DUPLICATE = "Tag handle '%s' already declared before, handle must be unique";
     /** @var YamlProperties */
     private $__yaml__object__api;
-
-    const UNDEFINED_METHOD = self::class.": undefined method '%s', valid methods are (addReference,getReference,getAllReferences,addComment,getComment,setText,addTag,hasDocStart,isTagged)";
-    const UNKNOWN_REFERENCE = "no reference named: '%s', known are : (%s)";
-    const UNAMED_REFERENCE  = "reference MUST have a name";
-    const TAGHANDLE_DUPLICATE = "Tag handle '%s' already declared before, handle must be unique";
 
     /**
      * Construct the YamlObject making sure the indices can be accessed directly
@@ -35,7 +40,7 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
      *
      * @return string String representation of the object.
      */
-    public function __toString():string
+    public function __toString(): string
     {
         return $this->__yaml__object__api->value ?? serialize($this);
     }
@@ -44,19 +49,20 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
     {
         return $this->__yaml__object__api->_options;
     }
+
     /**
      * Adds a reference.
      *
-     * @param string $name  The reference name
-     * @param mixed  $value The reference value
+     * @param string $name The reference name
+     * @param mixed $value The reference value
      *
-     * @throws \UnexpectedValueException  (description)
      * @return mixed
+     * @throws UnexpectedValueException  (description)
      */
     public function &addReference(string $name, $value)
     {
         if (empty($name)) {
-            throw new \UnexpectedValueException(self::UNAMED_REFERENCE);
+            throw new UnexpectedValueException(self::UNAMED_REFERENCE);
         }
         // var_dump("DEBUG: '$name' added as reference");
         $this->__yaml__object__api->_anchors[$name] = $value;
@@ -69,16 +75,16 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
      * @param string $name Name of the reference
      *
      * @return mixed Value of the reference
-     * @throws \UnexpectedValueException    if there's no reference by that $name
+     * @throws UnexpectedValueException    if there's no reference by that $name
      */
     public function &getReference($name)
     {
         if (array_key_exists($name, $this->__yaml__object__api->_anchors)) {
             return $this->__yaml__object__api->_anchors[$name];
         }
-        throw new \UnexpectedValueException(sprintf(self::UNKNOWN_REFERENCE,
-                                                    $name, implode(',',array_keys($this->__yaml__object__api->_anchors)))
-                                                );
+        throw new UnexpectedValueException(sprintf(self::UNKNOWN_REFERENCE,
+                $name, implode(',', array_keys($this->__yaml__object__api->_anchors)))
+        );
     }
 
     /**
@@ -86,7 +92,7 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
      *
      * @return array
      */
-    public function getAllReferences():array
+    public function getAllReferences(): array
     {
         return $this->__yaml__object__api->_anchors;
     }
@@ -94,8 +100,8 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
     /**
      * Adds a comment.
      *
-     * @param int    $lineNumber The line number at which the comment should appear
-     * @param string $value      The comment
+     * @param int $lineNumber The line number at which the comment should appear
+     * @param string $value The comment
      *
      * @return null
      */
@@ -113,7 +119,7 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
      */
     public function getComment(int $lineNumber = null)
     {
-        if (array_key_exists((int) $lineNumber, $this->__yaml__object__api->_comments)) {
+        if (array_key_exists((int)$lineNumber, $this->__yaml__object__api->_comments)) {
             return $this->__yaml__object__api->_comments[$lineNumber];
         }
         return $this->__yaml__object__api->_comments;
@@ -126,7 +132,7 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
      *
      * @return YamlObject
      */
-    public function setText(string $value):YamlObject
+    public function setText(string $value): YamlObject
     {
         $this->__yaml__object__api->value .= ltrim($value);
         return $this;
@@ -145,7 +151,7 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
     {
         //  It is an error to specify more than one “TAG” directive for the same handle in the same document, even if both occurrences give the same prefix.
         if (array_key_exists($handle, $this->__yaml__object__api->_tags)) {
-            throw new \Exception(sprintf(self::TAGHANDLE_DUPLICATE, $handle), 1);
+            throw new Exception(sprintf(self::TAGHANDLE_DUPLICATE, $handle), 1);
         }
         $this->__yaml__object__api->_tags[$handle] = $prefix;
     }
@@ -155,7 +161,7 @@ class YamlObject extends \ArrayIterator implements \JsonSerializable
      *
      * @return boolean  True if document has start, False otherwise.
      */
-    public function hasDocStart():bool
+    public function hasDocStart(): bool
     {
         return is_bool($this->__yaml__object__api->_hasDocStart);
     }

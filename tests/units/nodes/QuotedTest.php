@@ -2,10 +2,8 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Nodes\Quoted;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class QuotedTest.
@@ -25,19 +23,19 @@ class QuotedTest extends TestCase
     private $nodeQuoted;
 
     /**
+     * @covers \Dallgoot\Yaml\Nodes\Quoted::build
+     */
+    public function testBuild(): void
+    {
+        $this->assertEquals("a quoted string", $this->nodeQuoted->build());
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
         /** @todo Maybe add some arguments to this constructor */
         $this->nodeQuoted = new Quoted('"a quoted string"');
-    }
-
-    /**
-     * @covers \Dallgoot\Yaml\Nodes\Quoted::build
-     */
-    public function testBuild(): void
-    {
-        $this->assertEquals("a quoted string", $this->nodeQuoted->build());
     }
 }

@@ -21,24 +21,12 @@ abstract class Literals extends NodeGeneric
     public $tag;
     protected $_parent;
 
-    abstract protected function getFinalString(NodeList $list, int $refIndent = null):string;
-
     public function __construct(string $nodeString, int $line)
     {
         parent::__construct($nodeString, $line);
         if (isset($nodeString[1]) && in_array($nodeString[1], ['-', '+'])) {
             $this->identifier = $nodeString[1];
         }
-    }
-
-    public function add(NodeGeneric $child):NodeGeneric
-    {
-        if (is_null($this->value)) $this->value = new NodeList();
-        $candidate = $child;
-        if (!$child->isOneOf('Scalar', 'Blank', 'Comment', 'Quoted')) {
-            $candidate = new Scalar((string) $child->raw, $child->line);
-        }
-        return parent::add($candidate);
     }
 
     protected static function litteralStripLeading(NodeList &$list)
@@ -59,6 +47,16 @@ abstract class Literals extends NodeGeneric
         $list->rewind();
     }
 
+    public function add(NodeGeneric $child): NodeGeneric
+    {
+        if (is_null($this->value)) $this->value = new NodeList();
+        $candidate = $child;
+        if (!$child->isOneOf('Scalar', 'Blank', 'Comment', 'Quoted')) {
+            $candidate = new Scalar((string)$child->raw, $child->line);
+        }
+        return parent::add($candidate);
+    }
+
     /**
      * Builds a litteral (folded or not)
      * As per Documentation : 8.1.1.2. Block Chomping Indicator
@@ -77,7 +75,7 @@ abstract class Literals extends NodeGeneric
         }
         if (!is_null($this->value)) {
             $tmp = $this->getFinalString($this->value->filterComment());
-            $result = $this->identifier === '-' ? $tmp : $tmp."\n";
+            $result = $this->identifier === '-' ? $tmp : $tmp . "\n";
         }
         if ($this->_parent instanceof Root) {
             $this->_parent->getYamlObject()->setText($result);
@@ -87,16 +85,23 @@ abstract class Literals extends NodeGeneric
         }
     }
 
+    abstract protected function getFinalString(NodeList $list, int $refIndent = null): string;
+
+    public function isAwaitingChild(NodeGeneric $node): bool
+    {
+        return true;
+    }
+
     /**
      * Gets the correct string for child value.
      *
-     * @param      object         $child      The child
-     * @param      int|null       $refIndent  The reference indent
+     * @param object $child The child
+     * @param int|null $refIndent The reference indent
      *
      * @return     string  The child value.
      * @todo       double check behaviour for KEY and ITEM
      */
-    protected function getChildValue($child, $refIndent=0):string
+    protected function getChildValue($child, $refIndent = 0): string
     {
         $value = $child->value;
         $start = '';
@@ -112,13 +117,8 @@ abstract class Literals extends NodeGeneric
             $value = new NodeList($value);
 
         } elseif ($value instanceof NodeList && !($child instanceof Scalar)) {
-            $start = ltrim($child->raw)."\n";
+            $start = ltrim($child->raw) . "\n";
         }
-        return $start.$this->getFinalString($value, $refIndent);
-    }
-
-    public function isAwaitingChild(NodeGeneric $node):bool
-    {
-        return true;
+        return $start . $this->getFinalString($value, $refIndent);
     }
 }

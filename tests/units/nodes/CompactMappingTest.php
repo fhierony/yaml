@@ -2,14 +2,12 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Compact;
 use Dallgoot\Yaml\NodeList;
 use Dallgoot\Yaml\Nodes\CompactMapping;
 use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class CompactMappingTest.
@@ -27,14 +25,6 @@ class CompactMappingTest extends TestCase
      * @var CompactMapping $nodeCompactMapping An instance of "Nodes\CompactMapping" to test.
      */
     private $nodeCompactMapping;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->nodeCompactMapping = new CompactMapping(" {a : 123, b: abc }  ", 42);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\CompactMapping::__construct
@@ -68,5 +58,13 @@ class CompactMappingTest extends TestCase
         $this->assertTrue($result instanceof Compact);
         $this->assertTrue(property_exists($result, 'a'));
         $this->assertEquals(123, $result->a);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->nodeCompactMapping = new CompactMapping(" {a : 123, b: abc }  ", 42);
     }
 }

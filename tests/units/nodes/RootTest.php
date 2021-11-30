@@ -2,15 +2,14 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
-use Dallgoot\Yaml\Nodes\Root;
-use Dallgoot\Yaml\Nodes\Key;
-
 use Dallgoot\Yaml\NodeList;
+use Dallgoot\Yaml\Nodes\Key;
+use Dallgoot\Yaml\Nodes\Root;
 use Dallgoot\Yaml\YamlObject;
+use Exception;
+use ParseError;
+use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 /**
  * Class RootTest.
@@ -30,15 +29,6 @@ class RootTest extends TestCase
     private $nodeRoot;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->nodeRoot = new Root();
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Root::__construct
      */
     public function testConstruct(): void
@@ -54,7 +44,7 @@ class RootTest extends TestCase
         $this->assertEquals($this->nodeRoot, $this->nodeRoot->getParent());
         $keyNode = new Key(' falsekey:', 1);
         $keyNode->add($this->nodeRoot);
-        $this->expectException(\ParseError::class);
+        $this->expectException(ParseError::class);
         $this->nodeRoot->getParent();
     }
 
@@ -71,7 +61,7 @@ class RootTest extends TestCase
      */
     public function testYamlObjectAbsent()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->nodeRoot->getYamlObject();
     }
 
@@ -80,7 +70,7 @@ class RootTest extends TestCase
      */
     public function testBuildFinal(): void
     {
-        $buildFinal = new \ReflectionMethod($this->nodeRoot, 'buildFinal');
+        $buildFinal = new ReflectionMethod($this->nodeRoot, 'buildFinal');
         $buildFinal->setAccessible(true);
         $yamlObject = new YamlObject(0);
         $result = $buildFinal->invoke($this->nodeRoot, $yamlObject);
@@ -88,12 +78,12 @@ class RootTest extends TestCase
     }
 
     /**
-     * @covers \Dallgoot\Yaml\Nodes\Root::getYamlObject
+     * @covers  \Dallgoot\Yaml\Nodes\Root::getYamlObject
      * @depends testBuildFinal
      */
     public function testYamlObjectPresent()
     {
-        $buildFinal = new \ReflectionMethod($this->nodeRoot, 'buildFinal');
+        $buildFinal = new ReflectionMethod($this->nodeRoot, 'buildFinal');
         $buildFinal->setAccessible(true);
         $yamlObject = new YamlObject(0);
         $result = $buildFinal->invoke($this->nodeRoot, $yamlObject);
@@ -109,6 +99,15 @@ class RootTest extends TestCase
     {
         $yamlObject = new YamlObject(0);
         $this->assertTrue($this->nodeRoot->build($yamlObject) instanceof YamlObject);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->nodeRoot = new Root();
     }
 
 }

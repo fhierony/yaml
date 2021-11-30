@@ -1,9 +1,10 @@
 <?php
+
 namespace Dallgoot\Yaml\Tag;
 
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\NodeList;
 use Dallgoot\Yaml\Nodes;
+use Exception;
 
 /**
  *
@@ -20,11 +21,11 @@ class SymfonySchema implements SchemaInterface
      *
      * Specific Handler for Symfony custom tag : 'php/object'
      *
-     * @param object             $node   The node
-     * @param object|array|null  $parent The parent
+     * @param object $node The node
+     * @param object|array|null $parent The parent
      *
-     * @throws Exception if unserialize fails OR if its a NodeList (no support of multiple values for this tag)
      * @return object    the unserialized object according to Node value
+     * @throws Exception if unserialize fails OR if its a NodeList (no support of multiple values for this tag)
      */
     public final static function PHPobjectHandler(object $node)
     {
@@ -32,16 +33,17 @@ class SymfonySchema implements SchemaInterface
             $phpObject = unserialize($node->raw);
             // NOTE : we assume this is only used for Object types (if a boolean false is serialized this will FAIL)
             if (is_bool($phpObject)) {
-                throw new \Exception("value for tag 'php/object' could NOT be unserialized");
+                throw new Exception("value for tag 'php/object' could NOT be unserialized");
             }
             return $phpObject;
         } elseif ($node instanceof NodeList) {
-            throw new \Exception("tag 'php/object' can NOT be a NodeList");
+            throw new Exception("tag 'php/object' can NOT be a NodeList");
         }
     }
 
-    public function __call($name, $arguments) {
+    public function __call($name, $arguments)
+    {
         //TODO : handle 'php/object'
-        throw new \Exception("no handler for tag '$name' in ".self::class, 1);
+        throw new Exception("no handler for tag '$name' in " . self::class, 1);
     }
 }

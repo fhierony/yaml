@@ -2,13 +2,10 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Nodes\Item;
 use Dallgoot\Yaml\Nodes\LiteralFolded;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class LiteralFoldedTest.
@@ -28,24 +25,15 @@ class LiteralFoldedTest extends TestCase
     private $nodeLitFolded;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->nodeLitFolded = new LiteralFolded('>-', 1);
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\LiteralFolded::getFinalString
      */
     public function testGetFinalString(): void
     {
-        $line1  = new Scalar(' - with inside', 2);
+        $line1 = new Scalar(' - with inside', 2);
         $line1a = new Scalar('    two', 3);
         $line1b = new Scalar('    children', 4);
-        $line2  = new Scalar('      some more indented text', 5);
-        $line3  = new Scalar('    other less indented text', 6);
+        $line2 = new Scalar('      some more indented text', 5);
+        $line3 = new Scalar('    other less indented text', 6);
         $list = new NodeList;
         $list->push($line1);
         $list->push($line1a);
@@ -55,5 +43,14 @@ class LiteralFoldedTest extends TestCase
         $this->assertEquals(
             "- with inside\ntwo\nchildren\nsome more indented text\nother less indented text",
             $this->nodeLitFolded->getFinalString($list));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->nodeLitFolded = new LiteralFolded('>-', 1);
     }
 }

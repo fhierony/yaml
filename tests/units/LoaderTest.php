@@ -2,18 +2,20 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Generator;
 use Dallgoot\Yaml\Loader;
-use Dallgoot\Yaml\YamlObject;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Partial;
 use Dallgoot\Yaml\Nodes\Root;
 use Dallgoot\Yaml\Nodes\Scalar;
+use Dallgoot\Yaml\YamlObject;
+use Exception;
+use Generator;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
+use function property_exists;
 
 /**
  * Class LoaderTest.
@@ -33,19 +35,11 @@ class LoaderTest extends TestCase
     private $loader;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->loader = new Loader();
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Loader::__construct
      */
     public function testConstruct(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->loader->__construct("non sense string");
     }
 
@@ -55,7 +49,7 @@ class LoaderTest extends TestCase
      */
     public function testLoad(): void
     {
-        $this->assertEquals($this->loader, $this->loader->load(__DIR__.'/../definitions/parsing_tests.yml'));
+        $this->assertEquals($this->loader, $this->loader->load(__DIR__ . '/../definitions/parsing_tests.yml'));
     }
 
     /**
@@ -63,8 +57,19 @@ class LoaderTest extends TestCase
      */
     public function testLoadNoFile(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->loader->load('./non_existent_file');
+    }
+
+    /**
+     * @covers \Dallgoot\Yaml\Loader::getSourceGenerator
+     */
+    public function testGetSourceGenerator(): void
+    {
+        $method = new ReflectionMethod($this->loader, 'getSourceGenerator');
+        $method->setAccessible(true);
+        $result = $method->invoke($this->loader, '');
+        $this->assertTrue($result instanceof Generator, 'getSourceGenerator is NOT a \\Generator');
     }
 
     /**
@@ -89,21 +94,10 @@ class LoaderTest extends TestCase
     /**
      * @covers \Dallgoot\Yaml\Loader::getSourceGenerator
      */
-    public function testGetSourceGenerator(): void
-    {
-        $method = new \ReflectionMethod($this->loader, 'getSourceGenerator');
-        $method->setAccessible(true);
-        $result = $method->invoke($this->loader, '');
-        $this->assertTrue($result instanceof \Generator, 'getSourceGenerator is NOT a \\Generator');
-    }
-
-    /**
-     * @covers \Dallgoot\Yaml\Loader::getSourceGenerator
-     */
     public function testGetSourceGeneratorException(): void
     {
-        $this->expectException(\Exception::class);
-        $method = new \ReflectionMethod($this->loader, 'getSourceGenerator');
+        $this->expectException(Exception::class);
+        $method = new ReflectionMethod($this->loader, 'getSourceGenerator');
         $method->setAccessible(true);
         $generator = $method->invoke($this->loader, null);
         $generator->next();
@@ -114,10 +108,10 @@ class LoaderTest extends TestCase
      */
     public function testGetSourceGeneratorExceptionOnNoSource(): void
     {
-        $this->expectException(\Exception::class);
-        $method = new \ReflectionMethod($this->loader, 'getSourceGenerator');
+        $this->expectException(Exception::class);
+        $method = new ReflectionMethod($this->loader, 'getSourceGenerator');
         $method->setAccessible(true);
-        $property = new \ReflectionProperty($this->loader, 'content');
+        $property = new ReflectionProperty($this->loader, 'content');
         $property->setAccessible(true);
         $property->setValue($this->loader, []);
         $generator = $method->invoke($this->loader, null);
@@ -139,7 +133,7 @@ class LoaderTest extends TestCase
         $this->assertTrue($multidoc[1] instanceof YamlObject, 'array #1 is NOT a YamlObject');
         $yamlMapping = $this->loader->parse("key:\n    insidekey: value\nlessindent: value");
         $this->assertTrue($yamlMapping instanceof YamlObject);
-        $this->assertTrue(\property_exists($yamlMapping, 'key'));
+        $this->assertTrue(property_exists($yamlMapping, 'key'));
     }
 
     /**
@@ -147,7 +141,7 @@ class LoaderTest extends TestCase
      */
     public function testParseWithError(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         // fails because theres no NodeSetKey before
         $result = $this->loader->parse(' :: keyvalue');
     }
@@ -160,14 +154,14 @@ class LoaderTest extends TestCase
         $rootNode = new Root();
         $blankNode = new Blank('', 1);
         // NodeBlank get private method
-        $reflectorBlank = new \ReflectionClass($blankNode);
+        $reflectorBlank = new ReflectionClass($blankNode);
         $method = $reflectorBlank->getMethod('setParent');
         $method->setAccessible(true);
         // blankNode->setParent($rootNode) : sets the parent for blankNode
         $method->invoke($blankNode, $rootNode);
         $this->assertTrue($rootNode->value->count() === 0, 'rootNode has a child yet');
         // Loader get private property '_blankBuffer'
-        $reflectorLoader = new \ReflectionClass($this->loader);
+        $reflectorLoader = new ReflectionClass($this->loader);
         $blankBufferProp = $reflectorLoader->getProperty('_blankBuffer');
         $blankBufferProp->setAccessible(true);
         $this->assertTrue(count($blankBufferProp->getValue($this->loader)) === 0, '_blankbuffer is NOT empty');
@@ -177,7 +171,7 @@ class LoaderTest extends TestCase
         $this->assertTrue($blankBufferProp->getValue($this->loader)[0] instanceof Blank, 'blankBuffer has NO nodeBlank');
         //attach to parents => add child to parent
         // $this->loader->attachBlankLines($rootNode);
-        $attachBlankLinesMethod = new \ReflectionMethod($this->loader, '_attachBlankLines');
+        $attachBlankLinesMethod = new ReflectionMethod($this->loader, '_attachBlankLines');
         $attachBlankLinesMethod->setAccessible(true);
         $attachBlankLinesMethod->invoke($this->loader, $rootNode);
         $this->assertTrue(count($blankBufferProp->getValue($this->loader)) === 0, '_blankbuffer is NOT empty');
@@ -191,18 +185,18 @@ class LoaderTest extends TestCase
      */
     public function testNeedsSpecialProcess(): void
     {
-        $needsSpecialProcessMethod = new \ReflectionMethod($this->loader, 'needsSpecialProcess');
+        $needsSpecialProcessMethod = new ReflectionMethod($this->loader, 'needsSpecialProcess');
         $needsSpecialProcessMethod->setAccessible(true);
-        $current  = new Scalar('some text', 1);
+        $current = new Scalar('some text', 1);
         $previous = new Root();
         // $this->assertFalse($this->loader->needsSpecialProcess($current, $previous));
         $this->assertFalse($needsSpecialProcessMethod->invoke($this->loader, $current, $previous));
-        $current  = new Blank('', 1);
+        $current = new Blank('', 1);
         $previous = new Root();
         // $this->assertTrue($this->loader->needsSpecialProcess($current, $previous));
         $this->assertTrue($needsSpecialProcessMethod->invoke($this->loader, $current, $previous));
         $previous = new Key('key: "partial value', 1);
-        $current  = new Scalar(' end of partial value"',2);
+        $current = new Scalar(' end of partial value"', 2);
         // $this->assertTrue($this->loader->needsSpecialProcess($current, $previous));
         $this->assertTrue($needsSpecialProcessMethod->invoke($this->loader, $current, $previous));
         $current = new Partial(' " oddly quoted');
@@ -215,15 +209,15 @@ class LoaderTest extends TestCase
      */
     public function testOnError(): void
     {
-        $this->expectException(\Exception::class);
-        $generator = function() {
+        $this->expectException(Exception::class);
+        $generator = function () {
             yield 1 => 'this is the first line';
             yield 2 => 'this is the second line';
         };
         // $this->loader->onError(new \Exception, $generator());
-        $onErrorMethod = new \ReflectionMethod($this->loader, 'onError');
+        $onErrorMethod = new ReflectionMethod($this->loader, 'onError');
         $onErrorMethod->setAccessible(true);
-        $onErrorMethod->invoke(new \Exception, $generator());
+        $onErrorMethod->invoke(new Exception, $generator());
     }
 
     /**
@@ -232,12 +226,20 @@ class LoaderTest extends TestCase
     public function testOnErrorButNoException(): void
     {
         $this->loader = new Loader(null, Loader::NO_PARSING_EXCEPTIONS);
-        $generator = function() {
+        $generator = function () {
             yield 1 => 'this is the first line';
             yield 2 => 'this is the second line';
         };
-        $onErrorMethod = new \ReflectionMethod($this->loader, 'onError');
+        $onErrorMethod = new ReflectionMethod($this->loader, 'onError');
         $onErrorMethod->setAccessible(true);
-        $this->assertEquals(null, $onErrorMethod->invoke($this->loader, new \Exception, $generator()->key()));
+        $this->assertEquals(null, $onErrorMethod->invoke($this->loader, new Exception, $generator()->key()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->loader = new Loader();
     }
 }

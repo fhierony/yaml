@@ -2,13 +2,11 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\TagFactory;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Scalar;
 use Dallgoot\Yaml\Tag\CoreSchema;
+use Dallgoot\Yaml\TagFactory;
+use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 
 /**
@@ -28,20 +26,11 @@ class TagFactoryTest extends TestCase
      */
     private $tagFactory;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->tagFactory = new TagFactory();
-    }
-
     public function testCreateCoreSchema()
     {
         $this->tagFactory::$schemas = [];
         $this->tagFactory::$schemaHandles = [];
-        $createCoreSchema = new \ReflectionMethod($this->tagFactory, 'createCoreSchema');
+        $createCoreSchema = new ReflectionMethod($this->tagFactory, 'createCoreSchema');
         $createCoreSchema->setAccessible(true);
         $createCoreSchema->invoke(null);
         $this->assertArrayHasKey('!!', $this->tagFactory::$schemaHandles);
@@ -75,6 +64,15 @@ class TagFactoryTest extends TestCase
         $scalarNode = new Scalar('somestring', 1);
         $tagged = $this->tagFactory::runHandler('!!', 'str', $scalarNode);
         $this->assertEquals('somestring', $tagged);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->tagFactory = new TagFactory();
     }
 
 }

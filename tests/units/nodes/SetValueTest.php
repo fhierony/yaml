@@ -2,13 +2,11 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
-use Dallgoot\Yaml\Nodes\SetValue;
 use Dallgoot\Yaml\Nodes\Scalar;
+use Dallgoot\Yaml\Nodes\SetValue;
+use PHPUnit\Framework\TestCase;
+use StdClass;
 
 /**
  * Class SetValueTest.
@@ -28,15 +26,6 @@ class SetValueTest extends TestCase
     private $nodeSetValue;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe check arguments of this constructor. */
-        $this->nodeSetValue = new SetValue("  :   a string to test", 42);
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\SetValue::__construct
      */
     public function testConstruct(): void
@@ -50,7 +39,7 @@ class SetValueTest extends TestCase
      */
     public function testBuild(): void
     {
-        $parent = new \StdClass;
+        $parent = new StdClass;
         $parent->lastKey = null;
         $this->nodeSetValue->build($parent);
         $this->assertTrue(property_exists($parent, 'lastKey'));
@@ -66,5 +55,14 @@ class SetValueTest extends TestCase
         $this->assertFalse($this->nodeSetValue->isAwaitingChild($uselessNode));
         $this->nodeSetValue->value = null;
         $this->assertTrue($this->nodeSetValue->isAwaitingChild($uselessNode));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe check arguments of this constructor. */
+        $this->nodeSetValue = new SetValue("  :   a string to test", 42);
     }
 }

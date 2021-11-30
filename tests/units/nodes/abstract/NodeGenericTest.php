@@ -2,19 +2,18 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml;
-use Dallgoot\Yaml\NodeList;
 use Dallgoot\Yaml\NodeFactory;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
+use Dallgoot\Yaml\NodeList;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Item;
 use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Literal;
-use Dallgoot\Yaml\Nodes\LiteralFolded;
+use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Root;
+use Exception;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * Class NodeGenericTest.
@@ -32,17 +31,6 @@ class NodeGenericTest extends TestCase
      * @var NodeGeneric $node An instance of "NodeGeneric" to test.
      */
     private $node;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe check arguments of this constructor. */
-        $this->node = $this->getMockBuilder(NodeGeneric::class)
-                            ->setConstructorArgs(["a string to test", 1])
-                            ->getMockForAbstractClass();
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\NodeGeneric::__construct
@@ -63,13 +51,13 @@ class NodeGenericTest extends TestCase
     public function testSetParent(): void
     {
         $nodeRoot = new Root();
-        $reflector = new \ReflectionClass($this->node);
-        $method   = $reflector->getMethod('setParent');
+        $reflector = new ReflectionClass($this->node);
+        $method = $reflector->getMethod('setParent');
         $property = $reflector->getProperty('_parent');
         $method->setAccessible(true);
         $property->setAccessible(true);
 
-        $result  = $method->invoke($this->node, $nodeRoot);
+        $result = $method->invoke($this->node, $nodeRoot);
         $this->assertTrue($result instanceof NodeGeneric);
         $this->assertTrue($property->getValue($this->node) instanceof Root);
     }
@@ -85,7 +73,7 @@ class NodeGenericTest extends TestCase
         $this->assertTrue($this->node->getParent() instanceof Root, 'parent is not a NodeRoot');
         //undirect parent : $indent = 2
         $nodeRoot = new Root();
-        $nodeKey  = new Key('  sequence:', 1);
+        $nodeKey = new Key('  sequence:', 1);
         $nodeItem = new Item('    -', 2);
         $nodeKeyInside = new Key('       keyinitem: value', 3);
         $nodeKeyInside->add($this->node);
@@ -100,7 +88,7 @@ class NodeGenericTest extends TestCase
      */
     public function testGetParentException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->node->getParent();
     }
 
@@ -110,14 +98,14 @@ class NodeGenericTest extends TestCase
     public function testGetRoot(): void
     {
         $nodeRoot = new Root();
-        $nodeKey  = new Key('  sequence:', 1);
+        $nodeKey = new Key('  sequence:', 1);
         $nodeItem = new Item('    -', 2);
         $nodeKeyInside = new Key('       keyinitem: value', 3);
         $nodeKeyInside->add($this->node);
         $nodeItem->add($nodeKeyInside);
         $nodeKey->add($nodeItem);
         $nodeRoot->add($nodeKey);
-        $getRoot = new \ReflectionMethod($this->node, 'getRoot');
+        $getRoot = new ReflectionMethod($this->node, 'getRoot');
         $getRoot->setAccessible(true);
         $this->assertEquals($nodeRoot, $getRoot->invoke($this->node));
     }
@@ -127,8 +115,8 @@ class NodeGenericTest extends TestCase
      */
     public function testGetRootException(): void
     {
-        $this->expectException(\Exception::class);
-        $method = new \ReflectionMethod($this->node, 'getRoot');
+        $this->expectException(Exception::class);
+        $method = new ReflectionMethod($this->node, 'getRoot');
         $method->setAccessible(true);
         $method->invoke($this->node, null);
     }
@@ -182,7 +170,7 @@ class NodeGenericTest extends TestCase
     public function testGetTargetOnEqualIndent(): void
     {
         $blankNode = new Blank('', 1);
-        $nodeRoot  = new Root();
+        $nodeRoot = new Root();
         $nodeRoot->add($this->node);
         $this->assertEquals($nodeRoot, $this->node->getTargetOnEqualIndent($blankNode));
     }
@@ -194,7 +182,7 @@ class NodeGenericTest extends TestCase
      */
     public function testGetTargetOnLessIndent(): void
     {
-        $nodeRoot  = new Root();
+        $nodeRoot = new Root();
         $keyNode = new Key('sequence:', 1);
         $itemNode1 = new Item('    - item1', 2);
         $itemNode2 = new Item('    - item2', 3);
@@ -208,8 +196,8 @@ class NodeGenericTest extends TestCase
      */
     public function testGetTargetOnMoreIndent(): void
     {
-        $previousNode = new Key('emptykey:',1);
-        $nextNode = new Item('    - itemvalue',2);
+        $previousNode = new Key('emptykey:', 1);
+        $nextNode = new Item('    - itemvalue', 2);
         $this->assertEquals($previousNode, $previousNode->getTargetOnMoreIndent($nextNode));
     }
 
@@ -218,7 +206,7 @@ class NodeGenericTest extends TestCase
      */
     public function testIsAwaitingChild(): void
     {
-        $isAwaitingChild = new \ReflectionMethod($this->node, 'isAwaitingChild');
+        $isAwaitingChild = new ReflectionMethod($this->node, 'isAwaitingChild');
         $isAwaitingChild->setAccessible(true);
         $this->assertFalse($isAwaitingChild->invoke($this->node, new Blank('', 1)));
     }
@@ -240,5 +228,16 @@ class NodeGenericTest extends TestCase
     public function testDebugInfo(): void
     {
         $this->assertTrue(is_array($this->node->__debugInfo()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe check arguments of this constructor. */
+        $this->node = $this->getMockBuilder(NodeGeneric::class)
+            ->setConstructorArgs(["a string to test", 1])
+            ->getMockForAbstractClass();
     }
 }

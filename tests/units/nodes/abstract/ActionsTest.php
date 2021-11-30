@@ -2,12 +2,10 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Nodes\Actions;
 use Dallgoot\Yaml\Nodes\Scalar;
 use Dallgoot\Yaml\Nodes\Tag;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class ActionsTest.
@@ -25,17 +23,6 @@ class ActionsTest extends TestCase
      * @var Actions $nodeActions An instance of "Nodes\Actions" to test.
      */
     private $nodeActions;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        // $this->nodeActions = new Actions("   !!str    sometext", 42);
-        $this->nodeActions = $this->getMockBuilder(Actions::class)
-                            ->setConstructorArgs(["   !!str    sometext", 42])
-                            ->getMockForAbstractClass();
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\Actions::__construct
@@ -57,6 +44,17 @@ class ActionsTest extends TestCase
         $this->assertEquals("!!str", $tagNode->tag);
         $this->assertTrue($tagNode->value instanceof Scalar);
         $this->assertEquals("sometext", $tagNode->value->raw);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        // $this->nodeActions = new Actions("   !!str    sometext", 42);
+        $this->nodeActions = $this->getMockBuilder(Actions::class)
+            ->setConstructorArgs(["   !!str    sometext", 42])
+            ->getMockForAbstractClass();
     }
 
 }

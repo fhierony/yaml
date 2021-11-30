@@ -1,7 +1,9 @@
 <?php
+
 namespace Dallgoot\Yaml;
 
 // use \ReflectionMethod as RM;
+use Exception;
 
 /**
  * The Yaml\Tag class is an object type that encapsulates current
@@ -16,20 +18,19 @@ namespace Dallgoot\Yaml;
  */
 final class Tagged
 {
+    private const NO_NAME = '%s Error: a tag MUST have a name';
     /** @var string */
     public $tagName;
     /** @var mixed */
     public $value;
 
-    private const NO_NAME = '%s Error: a tag MUST have a name';
-
     public function __construct(string $tagName, $value)
     {
         if (empty($tagName)) {
-            throw new \Exception(sprintf(self::NO_NAME, __METHOD__));
+            throw new Exception(sprintf(self::NO_NAME, __METHOD__));
         }
         $this->tagName = $tagName;
-        $this->value   = $value;
+        $this->value = $value;
     }
 
     /**
@@ -40,10 +41,10 @@ final class Tagged
      */
     // private function checkNameValidity(string $providedName)
     // {
-        /* TODO  implement and throw Exception if invalid (setName method ???)
-         *The suffix must not contain any “!” character. This would cause the tag shorthand to be interpreted as having a named tag handle. In addition, the suffix must not contain the “[”, “]”, “{”, “}” and “,” characters. These characters would cause ambiguity with flow collection structures. If the suffix needs to specify any of the above restricted characters, they must be escaped using the “%” character. This behavior is consistent with the URI character escaping rules (specifically, section 2.3 of RFC2396).
+    /* TODO  implement and throw Exception if invalid (setName method ???)
+     *The suffix must not contain any “!” character. This would cause the tag shorthand to be interpreted as having a named tag handle. In addition, the suffix must not contain the “[”, “]”, “{”, “}” and “,” characters. These characters would cause ambiguity with flow collection structures. If the suffix needs to specify any of the above restricted characters, they must be escaped using the “%” character. This behavior is consistent with the URI character escaping rules (specifically, section 2.3 of RFC2396).
 
-         regex (([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
-        */
+     regex (([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
+    */
     // }
 }

@@ -2,10 +2,8 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Nodes\JSON;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class JSONTest.
@@ -25,19 +23,19 @@ class JSONTest extends TestCase
     private $nodeJSON;
 
     /**
+     * @covers \Dallgoot\Yaml\Nodes\JSON::build
+     */
+    public function testBuild(): void
+    {
+        $this->assertEquals([1, 2, 3], $this->nodeJSON->build());
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
         /** @todo Maybe add some arguments to this constructor */
-        $this->nodeJSON = new JSON('  [1,2,3]',1);
-    }
-
-    /**
-     * @covers \Dallgoot\Yaml\Nodes\JSON::build
-     */
-    public function testBuild(): void
-    {
-        $this->assertEquals([1,2,3], $this->nodeJSON->build());
+        $this->nodeJSON = new JSON('  [1,2,3]', 1);
     }
 }

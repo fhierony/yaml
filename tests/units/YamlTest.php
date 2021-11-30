@@ -2,12 +2,11 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml;
 use Dallgoot\Yaml\YamlObject;
-use Dallgoot\Yaml\Nodes\Root;
+use Exception;
+use PHPUnit\Framework\TestCase;
+use Throwable;
 
 /**
  * Class YamlTest.
@@ -27,15 +26,6 @@ class YamlTest extends TestCase
     private $yaml;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->yaml = new Yaml();
-    }
-
-    /**
      * @covers \Dallgoot\Yaml::parse
      */
     public function testParse(): void
@@ -49,7 +39,7 @@ class YamlTest extends TestCase
      */
     public function testParseException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->yaml::parse('::');
     }
 
@@ -58,7 +48,7 @@ class YamlTest extends TestCase
      */
     public function testParseFile(): void
     {
-        $this->assertTrue($this->yaml::parseFile(__DIR__."/../definitions/parsing_tests.yml") instanceof YamlObject);
+        $this->assertTrue($this->yaml::parseFile(__DIR__ . "/../definitions/parsing_tests.yml") instanceof YamlObject);
     }
 
     /**
@@ -66,7 +56,7 @@ class YamlTest extends TestCase
      */
     public function testParseFileException(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->yaml::parseFile('ssh:example.com');
     }
 
@@ -75,7 +65,7 @@ class YamlTest extends TestCase
      */
     public function testDump(): void
     {
-        $this->assertEquals("- 1\n- 2\n- 3", $this->yaml::dump([1,2,3]));
+        $this->assertEquals("- 1\n- 2\n- 3", $this->yaml::dump([1, 2, 3]));
         $this->assertEquals("--- some text\n", $this->yaml::dump('some text'));
     }
 
@@ -84,7 +74,7 @@ class YamlTest extends TestCase
      */
     public function testDumpException(): void
     {
-        $this->expectException(\Throwable::class);
+        $this->expectException(Throwable::class);
         $this->yaml::dump(null);
     }
 
@@ -94,7 +84,7 @@ class YamlTest extends TestCase
     public function testDumpFile(): void
     {
         $filename = 'dumperTest.yml';
-        $result = $this->yaml::dumpFile($filename, [1,2,3]);
+        $result = $this->yaml::dumpFile($filename, [1, 2, 3]);
         $this->assertTrue($result);
         $this->assertEquals("- 1\n- 2\n- 3", file_get_contents($filename));
         unlink($filename);
@@ -105,7 +95,16 @@ class YamlTest extends TestCase
      */
     public function testDumpFileException(): void
     {
-        $this->expectException(\Throwable::class);
+        $this->expectException(Throwable::class);
         $this->yaml::dumpFile('someFileName', null);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->yaml = new Yaml();
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Dallgoot\Yaml\Compact;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class CompactTest.
@@ -24,14 +23,6 @@ class CompactTest extends TestCase
     private $compact;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->compact = new Compact([]);
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Compact::__construct
      */
     public function testConstruct(): void
@@ -48,5 +39,13 @@ class CompactTest extends TestCase
     public function testJsonSerialize(): void
     {
         $this->assertTrue(is_array($this->compact->jsonSerialize()));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->compact = new Compact([]);
     }
 }

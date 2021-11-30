@@ -2,15 +2,13 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\YamlObject;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Anchor;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Root;
+use Dallgoot\Yaml\YamlObject;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * Class AnchorTest.
@@ -30,22 +28,14 @@ class AnchorTest extends TestCase
     private $nodeAnchor;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->nodeAnchor = new Anchor('&aaa sometext', 1);
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Anchor::build
      */
     public function testBuild(): void
     {
         $yamlObject = new YamlObject(0);
-        $rootNode   = new Root();
+        $rootNode = new Root();
         $rootNode->add($this->nodeAnchor);
-        $reflector  = new \ReflectionClass($rootNode);
+        $reflector = new ReflectionClass($rootNode);
         $buildFinal = $reflector->getMethod('buildFinal');
         $buildFinal->setAccessible(true);
         $buildFinal->invoke($rootNode, $yamlObject);
@@ -53,12 +43,12 @@ class AnchorTest extends TestCase
         // test exsting reference
         $anchorValue = '12345';
         $yamlObject = new YamlObject(0);
-        $rootNode   = new Root();
+        $rootNode = new Root();
         $this->nodeAnchor = new Anchor('*aaa', 1);
 
         $rootNode->add($this->nodeAnchor);
         $yamlObject->addReference('aaa', $anchorValue);
-        $buildFinal  = new \ReflectionMethod($rootNode, 'buildFinal');
+        $buildFinal = new ReflectionMethod($rootNode, 'buildFinal');
         $buildFinal->setAccessible(true);
         $buildFinal->invoke($rootNode, $yamlObject);
         $this->assertEquals('12345', $this->nodeAnchor->build());
@@ -73,5 +63,13 @@ class AnchorTest extends TestCase
         $this->assertFalse($this->nodeAnchor->IsAwaitingChild($uselessNode));
         $this->nodeAnchor->value = null;
         $this->assertTrue($this->nodeAnchor->IsAwaitingChild($uselessNode));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->nodeAnchor = new Anchor('&aaa sometext', 1);
     }
 }

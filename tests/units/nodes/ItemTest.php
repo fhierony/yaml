@@ -2,12 +2,7 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\YamlObject;
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Item;
 use Dallgoot\Yaml\Nodes\Key;
@@ -15,6 +10,11 @@ use Dallgoot\Yaml\Nodes\Root;
 use Dallgoot\Yaml\Nodes\Scalar;
 use Dallgoot\Yaml\Nodes\SetKey;
 use Dallgoot\Yaml\Nodes\SetValue;
+use Dallgoot\Yaml\YamlObject;
+use Exception;
+use ParseError;
+use PHPUnit\Framework\TestCase;
+use StdClass;
 
 /**
  * Class ItemTest.
@@ -32,15 +32,6 @@ class ItemTest extends TestCase
      * @var Item $nodeItem An instance of "Nodes\Item" to test.
      */
     private $nodeItem;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe check arguments of this constructor. */
-        $this->nodeItem = new Item("  -", 42);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\Item::__construct
@@ -62,12 +53,12 @@ class ItemTest extends TestCase
         $this->assertTrue(is_null($this->nodeItem->value));
         //
         $this->nodeItem = new Item('  - keyinside: keyvalue', 1);
-        $keyNode        = new Key('    anotherkey: anothervalue', 3);
+        $keyNode = new Key('    anotherkey: anothervalue', 3);
         $this->nodeItem->add($keyNode);
         $this->assertTrue($this->nodeItem->value instanceof NodeList);
         //
         $this->nodeItem = new Item('  - keyinside:', 3);
-        $keyNode        = new Key('      childkey: anothervalue', 4);
+        $keyNode = new Key('      childkey: anothervalue', 4);
         $this->nodeItem->add($keyNode);
         $keyinside = $this->nodeItem->value;
         $this->assertEquals($keyNode, $keyinside->value);
@@ -78,9 +69,9 @@ class ItemTest extends TestCase
      */
     public function testAddException(): void
     {
-        $this->expectException(\ParseError::class);
+        $this->expectException(ParseError::class);
         $this->nodeItem = new Item('  - keyinside: keyvalue', 1);
-        $keyNode        = new Key('        anotherkey: anothervalue', 3);
+        $keyNode = new Key('        anotherkey: anothervalue', 3);
         $this->nodeItem->add($keyNode);
     }
 
@@ -137,7 +128,7 @@ class ItemTest extends TestCase
      */
     public function testBuildWhenParentIsString()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $parent = '';
         $this->nodeItem->build($parent);
     }
@@ -147,8 +138,8 @@ class ItemTest extends TestCase
      */
     public function testBuildWhenParentIsObject()
     {
-        $this->expectException(\Exception::class);
-        $parent = new \StdClass;
+        $this->expectException(Exception::class);
+        $parent = new StdClass;
         $this->nodeItem->build($parent);
     }
 
@@ -170,5 +161,14 @@ class ItemTest extends TestCase
         $scalarNode = new Scalar('  some text', 43);
         $this->nodeItem->add($keyNode);
         $this->assertTrue($this->nodeItem->isAwaitingChild($scalarNode));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe check arguments of this constructor. */
+        $this->nodeItem = new Item("  -", 42);
     }
 }

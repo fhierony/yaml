@@ -2,9 +2,9 @@
 
 namespace Dallgoot\Yaml\Nodes;
 
+use Dallgoot\Yaml\Compact;
 use Dallgoot\Yaml\NodeFactory;
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Compact;
 use Dallgoot\Yaml\Regex;
 
 /**
@@ -18,7 +18,7 @@ class CompactSequence extends NodeGeneric
     public function __construct(string $nodeString, int $line)
     {
         parent::__construct($nodeString, $line);
-        preg_match_all(Regex::SEQUENCE_VALUES, trim(substr(trim($nodeString), 1,-1)), $matches);
+        preg_match_all(Regex::SEQUENCE_VALUES, trim(substr(trim($nodeString), 1, -1)), $matches);
         foreach ($matches['item'] as $key => $item) {
             $i = new Item('', $line);
             $i->indent = null;
@@ -38,7 +38,7 @@ class CompactSequence extends NodeGeneric
             $this->value = new NodeList($this->value);
             $this->value->type = NodeList::SEQUENCE;
         }
-        $arr = (array) $this->value->build();
+        $arr = (array)$this->value->build();
         return new Compact($arr);
     }
 }

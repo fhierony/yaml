@@ -2,10 +2,8 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Nodes\DocEnd;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class DocEndTest.
@@ -25,19 +23,19 @@ class DocEndTest extends TestCase
     private $nodeDocEnd;
 
     /**
+     * @covers \Dallgoot\Yaml\Nodes\DocEnd::build
+     */
+    public function testBuild(): void
+    {
+        $this->assertTrue(is_null($this->nodeDocEnd->build()));
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
         /** @todo Maybe add some arguments to this constructor */
         $this->nodeDocEnd = new DocEnd('...');
-    }
-
-    /**
-     * @covers \Dallgoot\Yaml\Nodes\DocEnd::build
-     */
-    public function testBuild(): void
-    {
-        $this->assertTrue(is_null($this->nodeDocEnd->build()));
     }
 }

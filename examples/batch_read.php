@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Dallgoot\Yaml\Loader;
 
@@ -11,9 +11,8 @@ $yloader = new Loader(null, 0, $debug);
 //documents to load
 $files = ['examples/dummy.yml', 'examples/config.yml'];
 
-foreach($files as $key => $fileName)
-{
-    $yamlObjList[] =  $yloader->load($fileName)->parse();
+foreach ($files as $key => $fileName) {
+    $yamlObjList[] = $yloader->load($fileName)->parse();
 }
 
 var_dump($yamlObjList);

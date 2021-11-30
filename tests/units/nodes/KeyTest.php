@@ -2,22 +2,19 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Anchor;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Comment;
 use Dallgoot\Yaml\Nodes\Item;
 use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Literal;
-use Dallgoot\Yaml\Nodes\Literals;
 use Dallgoot\Yaml\Nodes\Root;
 use Dallgoot\Yaml\Nodes\Scalar;
-
-use Dallgoot\Yaml\NodeFactory;
 use Dallgoot\Yaml\YamlObject;
+use ParseError;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use StdClass;
 
 /**
  * Class KeyTest.
@@ -37,15 +34,6 @@ class KeyTest extends TestCase
     private $nodeKey;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe check arguments of this constructor. */
-        $this->nodeKey = new Key("key: value", 1);
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Key::__construct
      */
     public function testConstruct(): void
@@ -62,7 +50,7 @@ class KeyTest extends TestCase
      */
     public function testConstructException(): void
     {
-        $this->expectException(\ParseError::class);
+        $this->expectException(ParseError::class);
         $this->nodeKey->__construct('not a key at all and no matches', 1);
     }
 
@@ -71,7 +59,7 @@ class KeyTest extends TestCase
      */
     public function testSetIdentifier(): void
     {
-        $reflector = new \ReflectionClass($this->nodeKey);
+        $reflector = new ReflectionClass($this->nodeKey);
         $identifier = $reflector->getProperty('identifier');
         $identifier->setAccessible(true);
 
@@ -92,7 +80,7 @@ class KeyTest extends TestCase
      */
     public function testSetIdentifierAsEmptyString()
     {
-        $this->expectException(\ParseError::class);
+        $this->expectException(ParseError::class);
         $this->nodeKey->setIdentifier('');
     }
 
@@ -179,6 +167,7 @@ class KeyTest extends TestCase
         $this->nodeKey->value = new Anchor(' &anchor already have a value', 1);
         $this->assertFalse($this->nodeKey->isAwaitingChild(new Key('  key2:', 2)));
     }
+
     /**
      * @covers \Dallgoot\Yaml\Nodes\Key::build
      */
@@ -193,7 +182,7 @@ class KeyTest extends TestCase
         $this->assertTrue(property_exists($built, 'key'));
         $this->assertEquals('value', $built->key);
         //
-        $parent = new \StdClass;
+        $parent = new StdClass;
         $built = $this->nodeKey->build($parent);
         $this->assertTrue(property_exists($parent, 'key'));
         $this->assertEquals('value', $parent->key);
@@ -207,5 +196,14 @@ class KeyTest extends TestCase
         $built = $this->nodeKey->build();
         $this->assertTrue(property_exists($built, 'key'));
         $this->assertEquals(null, $built->key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe check arguments of this constructor. */
+        $this->nodeKey = new Key("key: value", 1);
     }
 }

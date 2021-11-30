@@ -6,13 +6,12 @@ function displayTitle {
     echo -e "\e[1m*** Testing with \e[92m$1\e[39m\e[0m ***"
 }
 function version_gt() {
-    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
+    test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"
 }
 echo Checking Docker is running...
 docker version
 docker_status=$?
-if test $docker_status -gt 0
-then
+if test $docker_status -gt 0; then
     echo "Error: Docker is not running correctly ???"
     exit 1
 fi
@@ -25,7 +24,7 @@ fi
 
 # done
 # exit
-COMPOSER_CURRENT=$(composer show 'phpunit/phpunit' | grep -Eow "[0-9\.]+" -m 1 )
+COMPOSER_CURRENT=$(composer show 'phpunit/phpunit' | grep -Eow "[0-9\.]+" -m 1)
 # if version_gt $COMPOSER_CURRENT "6.5"; then
 #     composer remove phpunit/phpunit theseer/phpdox
 #     composer require phpunit/phpunit:^6.5
@@ -43,20 +42,16 @@ onlyMinor=1
 command="vendor/bin/phpunit \
                             --configuration ./configuration/phpunit.xml \
                             --testsuite All --no-coverage --columns 160 --disallow-test-output"
-                            # --testsuite units --no-coverage --columns 160 --disallow-test-output --no-logging"
+# --testsuite units --no-coverage --columns 160 --disallow-test-output --no-logging"
 
-for minor in "${!versions[@]}"
-do
+for minor in "${!versions[@]}"; do
     echo "********************* testing PHP 7.$minor ***************************"
     tag="cli-alpine"
-    if test $minor -eq 0
-    then
+    if test $minor -eq 0; then
         tag="cli"
     fi
-    if [ $onlyMinor != 1 ]
-    then
-        for patch in `seq 0 ${versions[$minor]}`
-        do
+    if [ $onlyMinor != 1 ]; then
+        for patch in $(seq 0 ${versions[$minor]}); do
             displayTitle "7.$minor.$patch"
             docker run --rm -v $(pwd):/app -w /app php:7.$minor.$patch-$tag $command
         done

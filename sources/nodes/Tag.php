@@ -3,9 +3,12 @@
 namespace Dallgoot\Yaml\Nodes;
 
 use Dallgoot\Yaml\NodeList;
+use Dallgoot\Yaml\Regex;
 use Dallgoot\Yaml\TagFactory;
 use Dallgoot\Yaml\Tagged;
-use Dallgoot\Yaml\Regex;
+use Exception;
+use Throwable;
+use UnexpectedValueException;
 
 /**
  *
@@ -17,12 +20,12 @@ use Dallgoot\Yaml\Regex;
 class Tag extends Actions
 {
 
-    public function isAwaitingChild(NodeGeneric $node):bool
+    public function isAwaitingChild(NodeGeneric $node): bool
     {
         return is_null($this->value);
     }
 
-    public function getTargetOnEqualIndent(NodeGeneric &$node):NodeGeneric
+    public function getTargetOnEqualIndent(NodeGeneric &$node): NodeGeneric
     {
         if (is_null($this->value) && $this->indent > 0) {
             return $this;
@@ -42,7 +45,7 @@ class Tag extends Actions
     {
         if (is_null($this->value) && $this->getParent() instanceof Root) {
             if (!preg_match(Regex::TAG_PARTS, $this->tag, $matches)) {
-                throw new \UnexpectedValueException("Tag '$this->tag' is invalid", 1);
+                throw new UnexpectedValueException("Tag '$this->tag' is invalid", 1);
             }
             $handle = $matches['handle'];
             $tagname = $matches['tagname'];
@@ -54,12 +57,12 @@ class Tag extends Actions
             $value = new NodeList(/** @scrutinizer ignore-type */ $value);
         }
         try {
-            $transformed = TagFactory::transform((string) $this->tag, $value, $parent);
+            $transformed = TagFactory::transform((string)$this->tag, $value, $parent);
             return $transformed;
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             return new Tagged($this->tag, is_null($value) ? null : $this->value->build($parent));
-        } catch (\Throwable $e) {
-            throw new \Exception("Tagged value could not be transformed for tag '$this->tag'", 1, $e);;
+        } catch (Throwable $e) {
+            throw new Exception("Tagged value could not be transformed for tag '$this->tag'", 1, $e);
         }
     }
 }

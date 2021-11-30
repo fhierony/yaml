@@ -12,23 +12,23 @@ use Dallgoot\Yaml\NodeList;
  */
 class Literal extends Literals
 {
-    public function getFinalString(NodeList $list, int $refIndent = null):string
+    public function getFinalString(NodeList $list, int $refIndent = null): string
     {
         $result = '';
         $list = $list->filterComment();
         if ($this->identifier !== '+') {
-             self::litteralStripTrailing($list);
+            self::litteralStripTrailing($list);
         }
         if ($list->count()) {
             $list->setIteratorMode(NodeList::IT_MODE_DELETE);
-            $first  = $list->shift();
+            $first = $list->shift();
             $indent = $refIndent ?? $first->indent;
             $result = $this->getChildValue($first, $indent);
             foreach ($list as $child) {
                 $value = "\n";
                 if (!($child instanceof Blank)) {
                     $newIndent = $indent > 0 ? $child->indent - $indent : 0;
-                    $value .= str_repeat(' ', $newIndent).$this->getChildValue($child, $indent);
+                    $value .= str_repeat(' ', $newIndent) . $this->getChildValue($child, $indent);
                 }
                 $result .= $value;
             }

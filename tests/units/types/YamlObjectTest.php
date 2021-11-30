@@ -2,10 +2,10 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Dallgoot\Yaml\YamlObject;
 use Dallgoot\Yaml\YamlProperties;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionProperty;
 
 /**
@@ -27,21 +27,13 @@ class YamlObjectTest extends TestCase
 
     private $refValue = 123;
     private $commentValue = '# this a full line comment';
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->yamlObject = new YamlObject(0);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\YamlObject::__construct
      */
     public function testConstruct(): void
     {
-        $reflector = new \ReflectionClass($this->yamlObject);
+        $reflector = new ReflectionClass($this->yamlObject);
         $__yaml__object__api = $reflector->getProperty('__yaml__object__api');
         $__yaml__object__api->setAccessible(true);
         $this->yamlObject->__construct(0);
@@ -54,7 +46,7 @@ class YamlObjectTest extends TestCase
     public function testToString(): void
     {
         $this->yamlObject->setText('some text value');
-        $this->assertTrue(is_string(''.$this->yamlObject));
+        $this->assertTrue(is_string('' . $this->yamlObject));
     }
 
     /**
@@ -65,7 +57,7 @@ class YamlObjectTest extends TestCase
         $this->assertEquals("_Empty YamlObject_", $this->yamlObject->jsonSerialize());
     }
 
-        /**
+    /**
      * @covers \Dallgoot\Yaml\YamlObject::addReference
      */
     public function testAddReference(): void
@@ -106,7 +98,7 @@ class YamlObjectTest extends TestCase
     }
 
     /**
-     * @covers \Dallgoot\Yaml\YamlObject::getComment
+     * @covers  \Dallgoot\Yaml\YamlObject::getComment
      * @depends testAddComment
      */
     public function testGetComment(): void
@@ -176,5 +168,14 @@ class YamlObjectTest extends TestCase
         $this->assertFalse($this->yamlObject->isTagged());
         $this->yamlObject->addTag('!', 'tag:clarkevans.com,2002');
         $this->assertTrue($this->yamlObject->isTagged());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->yamlObject = new YamlObject(0);
     }
 }

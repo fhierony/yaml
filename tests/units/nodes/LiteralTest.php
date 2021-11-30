@@ -2,12 +2,10 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\NodeList;
 use Dallgoot\Yaml\Nodes\Literal;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class LiteralTest.
@@ -27,15 +25,6 @@ class LiteralTest extends TestCase
     private $nodeLit;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->nodeLit = new Literal('|', 1);
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Literal::getFinalString
      */
     public function testGetFinalString(): void
@@ -48,6 +37,15 @@ class LiteralTest extends TestCase
         $list->push($line2);
         $list->push($line3);
         $this->assertEquals("some text\n  some more indented text\nother less indented text",
-                            $this->nodeLit->getFinalString($list));
+            $this->nodeLit->getFinalString($list));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->nodeLit = new Literal('|', 1);
     }
 }

@@ -2,15 +2,13 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Directive;
 use Dallgoot\Yaml\Nodes\Root;
 use Dallgoot\Yaml\TagFactory;
 use Dallgoot\Yaml\YamlObject;
+use ParseError;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class DirectiveTest.
@@ -30,15 +28,6 @@ class DirectiveTest extends TestCase
     private $nodeDirective;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->nodeDirective = new Directive('%YAML 1.2');
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Directive::build
      */
     public function testBuild(): void
@@ -54,7 +43,7 @@ class DirectiveTest extends TestCase
 
     public function testBuildError(): void
     {
-        $this->expectException(\ParseError::class);
+        $this->expectException(ParseError::class);
         $this->nodeDirective = new Directive('%TAG ! tag:clarkevans.com,2002:');
         $directive2 = new Directive('%TAG ! tag:clarkevans.com,2002:');
         $rootNode = new Root;
@@ -62,6 +51,7 @@ class DirectiveTest extends TestCase
         $yamlObject = new YamlObject(0);
         $rootNode->build($yamlObject);
     }
+
     /**
      * @covers \Dallgoot\Yaml\Nodes\Directive::add
      */
@@ -69,5 +59,14 @@ class DirectiveTest extends TestCase
     {
         $uselessNode = new Blank('', 2);
         $this->assertTrue($this->nodeDirective->add($uselessNode) === $uselessNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->nodeDirective = new Directive('%YAML 1.2');
     }
 }

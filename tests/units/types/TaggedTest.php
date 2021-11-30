@@ -2,9 +2,9 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Dallgoot\Yaml\Tagged;
+use Exception;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class TaggedTest.
@@ -24,20 +24,12 @@ class TaggedTest extends TestCase
     private $tag;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->tag = new Tagged("tagName", "a string to test");
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Tagged::__construct
      */
     public function testConstruct(): void
     {
-        $this->assertEquals("tagName",$this->tag->tagName);
-        $this->assertEquals("a string to test",$this->tag->value);
+        $this->assertEquals("tagName", $this->tag->tagName);
+        $this->assertEquals("a string to test", $this->tag->value);
     }
 
     /**
@@ -45,7 +37,15 @@ class TaggedTest extends TestCase
      */
     public function testConstructEmptyName(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->tag = new Tagged("", "a string to test");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->tag = new Tagged("tagName", "a string to test");
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Dallgoot\Yaml\Nodes;
 
+use Dallgoot\Yaml\Compact;
 use Dallgoot\Yaml\NodeFactory;
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Compact;
 use Dallgoot\Yaml\Regex;
 
 /**
@@ -18,9 +18,9 @@ class CompactMapping extends NodeGeneric
     public function __construct(string $nodeString, int $line)
     {
         parent::__construct($nodeString, $line);
-        preg_match_all(Regex::MAPPING_VALUES, trim(substr(trim($nodeString), 1,-1)), $matches);
+        preg_match_all(Regex::MAPPING_VALUES, trim(substr(trim($nodeString), 1, -1)), $matches);
         foreach ($matches['k'] as $index => $property) {
-            $pair = $property.': '.trim($matches['v'][$index]);
+            $pair = $property . ': ' . trim($matches['v'][$index]);
             $child = NodeFactory::get($pair, $line);
             $child->indent = null;
             $this->add($child);
@@ -36,7 +36,7 @@ class CompactMapping extends NodeGeneric
             $this->value = new NodeList($this->value);
             $this->value->type = NodeList::MAPPING;
         }
-        $obj = (object) $this->value->build();
+        $obj = (object)$this->value->build();
         return new Compact($obj);
     }
 }

@@ -2,15 +2,13 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Compact;
 use Dallgoot\Yaml\NodeList;
 use Dallgoot\Yaml\Nodes\CompactSequence;
 use Dallgoot\Yaml\Nodes\Item;
 use Dallgoot\Yaml\Nodes\JSON;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class CompactSequenceTest.
@@ -28,14 +26,6 @@ class CompactSequenceTest extends TestCase
      * @var CompactSequence $nodeCompactSequence An instance of "Nodes\CompactSequence" to test.
      */
     private $nodeCompactSequence;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->nodeCompactSequence = new CompactSequence(" [ 1, ad, [456] ]", 42);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\CompactSequence::__construct
@@ -73,5 +63,13 @@ class CompactSequenceTest extends TestCase
         $this->assertTrue($result instanceof Compact);
         $this->assertArrayHasKey(0, $result);
         $this->assertEquals([456], $result[0]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->nodeCompactSequence = new CompactSequence(" [ 1, ad, [456] ]", 42);
     }
 }

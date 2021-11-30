@@ -3,9 +3,11 @@
 namespace Dallgoot\Yaml;
 
 
-$o = new \StdClass;
+use StdClass;
 
-$o->key1 = new Compact([1,2,3]);
+$o = new StdClass;
+
+$o->key1 = new Compact([1, 2, 3]);
 
 
 return $o;

@@ -4,6 +4,8 @@ namespace Dallgoot\Yaml\Nodes;
 
 use Dallgoot\Yaml\NodeFactory;
 use Dallgoot\Yaml\Regex;
+use ParseError;
+use StdClass;
 
 /**
  *
@@ -13,14 +15,14 @@ use Dallgoot\Yaml\Regex;
  */
 class Key extends NodeGeneric
 {
-    const ERROR_NO_KEYNAME = self::class.": key has NO IDENTIFIER on line %d";
+    const ERROR_NO_KEYNAME = self::class . ": key has NO IDENTIFIER on line %d";
 
     public function __construct(string $nodeString, int $line, array $matches = null)
     {
         parent::__construct($nodeString, $line);
         if (is_null($matches)) {
-            if (!((bool) preg_match(Regex::KEY, ltrim($nodeString), $matches))) {
-                throw new \ParseError("Not a KEY:VALUE syntax ($nodeString)", 1);
+            if (!((bool)preg_match(Regex::KEY, ltrim($nodeString), $matches))) {
+                throw new ParseError("Not a KEY:VALUE syntax ($nodeString)", 1);
             }
         }
         $this->setIdentifier($matches[1]);
@@ -36,7 +38,7 @@ class Key extends NodeGeneric
     public function setIdentifier(string $keyString)
     {
         if ($keyString === '') {
-           throw new \ParseError(sprintf(self::ERROR_NO_KEYNAME, $this->line));
+            throw new ParseError(sprintf(self::ERROR_NO_KEYNAME, $this->line));
         } else {
             $node = NodeFactory::get($keyString);
             if ($node->isOneOf('Tag', 'Quoted')) {
@@ -44,7 +46,7 @@ class Key extends NodeGeneric
                 if (is_object($built)) {
                     $this->identifier = $built->value;
                 } else {
-                    $this->identifier = (string) $node->build();
+                    $this->identifier = (string)$node->build();
                 }
             } elseif ($node instanceof Scalar) {
                 $this->identifier = trim($node->raw);
@@ -52,16 +54,41 @@ class Key extends NodeGeneric
         }
     }
 
-    public function add(NodeGeneric $child):NodeGeneric
+    /**
+     * Builds a key and set the property + value to the given parent
+     *
+     * @param object|array $parent The parent
+     *
+     * @return null|StdClass
+     * @throws ParseError if Key has no name(identifier) Note: empty string is allowed
+     */
+    public function build(&$parent = null)
     {
-        if ($this->value instanceof NodeGeneric && $this->value->isOneOf('Literal','LiteralFolded', 'Anchor')) {
+        // var_dump("DEBUG KEY:".$this->identifier);
+        if ($this->value instanceof Anchor) {
+            $result = &$this->value->build();
+        } else {
+            $result = is_null($this->value) ? null : $this->value->build();
+        }
+        if (is_null($parent)) {
+            $parent = new StdClass;
+            $parent->{$this->identifier} = &$result;
+            return $parent;
+        } else {
+            $parent->{$this->identifier} = &$result;
+        }
+    }
+
+    public function add(NodeGeneric $child): NodeGeneric
+    {
+        if ($this->value instanceof NodeGeneric && $this->value->isOneOf('Literal', 'LiteralFolded', 'Anchor')) {
             return $this->value->add($child);
         } else {
             return parent::add($child);
         }
     }
 
-    public function getTargetOnEqualIndent(NodeGeneric &$node):NodeGeneric
+    public function getTargetOnEqualIndent(NodeGeneric &$node): NodeGeneric
     {
         if ($node instanceof Item) {
             return $this;
@@ -69,7 +96,7 @@ class Key extends NodeGeneric
         return $this->getParent();
     }
 
-    public function getTargetOnMoreIndent(NodeGeneric &$node):NodeGeneric
+    public function getTargetOnMoreIndent(NodeGeneric &$node): NodeGeneric
     {
         if (!is_null($this->value)) {
             if ($this->getDeepestNode()->isAwaitingChild($node)) {
@@ -79,12 +106,11 @@ class Key extends NodeGeneric
         return $this;
     }
 
-
-    public function isAwaitingChild(NodeGeneric $node):bool
+    public function isAwaitingChild(NodeGeneric $node): bool
     {
         if (is_null($this->value) || $node instanceof Comment) {
             return true;
-        } elseif($this->value instanceof NodeGeneric) {
+        } elseif ($this->value instanceof NodeGeneric) {
             $current = $this->value;
         } else {
             $current = $this->value->current();
@@ -106,30 +132,5 @@ class Key extends NodeGeneric
             return $current->isAwaitingChild($node);
         }
         return false;
-    }
-
-    /**
-     * Builds a key and set the property + value to the given parent
-     *
-     * @param object|array $parent The parent
-     *
-     * @throws \ParseError if Key has no name(identifier) Note: empty string is allowed
-     * @return null|\StdClass
-     */
-    public function build(&$parent = null)
-    {
-        // var_dump("DEBUG KEY:".$this->identifier);
-        if ($this->value instanceof Anchor) {
-            $result = &$this->value->build();
-        } else {
-            $result = is_null($this->value) ? null : $this->value->build();
-        }
-        if (is_null($parent)) {
-            $parent = new \StdClass;
-            $parent->{$this->identifier} = &$result;
-            return $parent;
-        } else {
-            $parent->{$this->identifier} = &$result;
-        }
     }
 }

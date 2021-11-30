@@ -2,10 +2,6 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Anchor;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Comment;
@@ -15,8 +11,8 @@ use Dallgoot\Yaml\Nodes\LiteralFolded;
 use Dallgoot\Yaml\Nodes\Root;
 use Dallgoot\Yaml\Nodes\Scalar;
 use Dallgoot\Yaml\Nodes\Tag;
-
 use Dallgoot\Yaml\YamlObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class DocStartTest.
@@ -34,15 +30,6 @@ class DocStartTest extends TestCase
      * @var DocStart $nodeDocStart An instance of "Nodes\DocStart" to test.
      */
     private $nodeDocStart;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe check arguments of this constructor. */
-        $this->nodeDocStart = new DocStart("---", 42);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\DocStart::__construct
@@ -94,7 +81,7 @@ class DocStartTest extends TestCase
         $nodeLit->add($nodeScalar2);
         $this->nodeDocStart->add($nodeLit);
         $this->assertTrue(is_null($this->nodeDocStart->build($yamlObject)));
-        $this->assertEquals("some text other text", ''.$yamlObject);
+        $this->assertEquals("some text other text", '' . $yamlObject);
 
     }
 
@@ -129,5 +116,14 @@ class DocStartTest extends TestCase
         $nodeLitFolded = new LiteralFolded('>-', 1);
         $this->nodeDocStart->value = $nodeLitFolded;
         $this->assertEquals($nodeLitFolded, $this->nodeDocStart->GetTargetOnEqualIndent($blank));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe check arguments of this constructor. */
+        $this->nodeDocStart = new DocStart("---", 42);
     }
 }

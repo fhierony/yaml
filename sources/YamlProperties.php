@@ -14,11 +14,11 @@ class YamlProperties
     /** @var null|boolean */
     public $_hasDocStart; // null = no docstart, true = docstart before document comments, false = docstart after document comments
     /** @var array */
-    public $_anchors  = [];
+    public $_anchors = [];
     /** @var array */
     public $_comments = [];
     /** @var array */
-    public $_tags     = [];
+    public $_tags = [];
     /** @var int */
     public $_options;
     /** @var null|string */

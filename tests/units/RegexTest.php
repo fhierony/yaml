@@ -2,10 +2,9 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\Regex;
+use PHPUnit\Framework\TestCase;
+use TypeError;
 
 /**
  * Class RegexTest.
@@ -23,15 +22,6 @@ class RegexTest extends TestCase
      * @var Regex $regex An instance of "Regex" to test.
      */
     private $regex;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->regex = new Regex();
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Regex::isDate
@@ -52,7 +42,7 @@ class RegexTest extends TestCase
      */
     public function testIsDateWithNoString(): void
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(TypeError::class);
         $this->assertFalse($this->regex::isDate(null));
     }
 
@@ -87,5 +77,14 @@ class RegexTest extends TestCase
 
         $this->assertFalse($this->regex::isProperlyQuoted('" \"a\" \'b\'  '));
 
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->regex = new Regex();
     }
 }

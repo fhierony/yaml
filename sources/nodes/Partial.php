@@ -3,6 +3,7 @@
 namespace Dallgoot\Yaml\Nodes;
 
 use Dallgoot\Yaml\NodeFactory;
+use ParseError;
 
 /**
  *
@@ -15,12 +16,12 @@ class Partial extends NodeGeneric
     /**
      * What first character to determine if escaped sequence are allowed
      *
-     * @param      NodeGeneric     $current     The current
-     * @param      array    $emptyLines  The empty lines
+     * @param NodeGeneric $current The current
+     * @param array $emptyLines The empty lines
      *
      * @return     boolean  true to skip normal Loader process, false to continue
      */
-    public function specialProcess(NodeGeneric &$current, array &$emptyLines):bool
+    public function specialProcess(NodeGeneric &$current, array &$emptyLines): bool
     {
         $parent = $this->getParent();
         $addValue = ltrim($current->raw);
@@ -32,7 +33,7 @@ class Partial extends NodeGeneric
             $addValue = "\n";
             $separator = '';
         }
-        $node = NodeFactory::get($this->raw.$separator.$addValue, $this->line);
+        $node = NodeFactory::get($this->raw . $separator . $addValue, $this->line);
         $node->indent = null;
         $parent->value = null;
         $parent->add($node);
@@ -41,6 +42,6 @@ class Partial extends NodeGeneric
 
     public function build(&$parent = null)
     {
-        throw new \ParseError("Partial value found at line $this->line", 1);
+        throw new ParseError("Partial value found at line $this->line", 1);
     }
 }

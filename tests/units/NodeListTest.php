@@ -2,18 +2,16 @@
 
 namespace Test\Dallgoot\Yaml;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
-use Dallgoot\Yaml\Nodes\DocStart;
 use Dallgoot\Yaml\Nodes\Comment;
+use Dallgoot\Yaml\Nodes\DocStart;
 use Dallgoot\Yaml\Nodes\Item;
 use Dallgoot\Yaml\Nodes\Key;
-use Dallgoot\Yaml\Nodes\SetKey;
 use Dallgoot\Yaml\Nodes\Scalar;
+use Dallgoot\Yaml\Nodes\SetKey;
+use PHPUnit\Framework\TestCase;
+use StdClass;
 
 /**
  * Class NodeListTest.
@@ -31,14 +29,6 @@ class NodeListTest extends TestCase
      * @var NodeList $nodeList An instance of "NodeList" to test.
      */
     private $nodeList;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->nodeList = new NodeList(new Blank('', 1));
-    }
 
     /**
      * @covers \Dallgoot\Yaml\NodeList::__construct
@@ -65,7 +55,7 @@ class NodeListTest extends TestCase
         $this->assertFalse($this->nodeList->hasContent());
     }
 
-   /**
+    /**
      * @covers \Dallgoot\Yaml\NodeList::hasContent
      */
     public function testHasContentWithDocStart(): void
@@ -108,13 +98,13 @@ class NodeListTest extends TestCase
     }
 
     /**
-     * @covers \Dallgoot\Yaml\NodeList::build
+     * @covers  \Dallgoot\Yaml\NodeList::build
      * @depends testPush
      */
     public function testBuild(): void
     {
-        $keyNode    = new Key('key: keyvalue', 1);
-        $itemNode   = new Item(' - itemvalue', 1);
+        $keyNode = new Key('key: keyvalue', 1);
+        $itemNode = new Item(' - itemvalue', 1);
         $scalarNode = new Scalar('a string value', 1);
         //expect object
         $this->nodeList->push($keyNode);
@@ -136,7 +126,7 @@ class NodeListTest extends TestCase
     {
         $arr = [];
         $this->assertEquals($arr, $this->nodeList->buildList($arr));
-        $obj = new \StdClass;
+        $obj = new StdClass;
         $this->assertEquals($obj, $this->nodeList->buildList($obj));
     }
 
@@ -174,5 +164,13 @@ class NodeListTest extends TestCase
         $filtered = $this->nodeList->filterComment();
         $this->assertEquals(1, $filtered->count());
         $this->assertEquals(2, $this->nodeList->count());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->nodeList = new NodeList(new Blank('', 1));
     }
 }

@@ -2,20 +2,18 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Comment;
 use Dallgoot\Yaml\Nodes\Item;
-use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Literal;
 use Dallgoot\Yaml\Nodes\LiteralFolded;
 use Dallgoot\Yaml\Nodes\Literals;
 use Dallgoot\Yaml\Nodes\Quoted;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
 
 /**
  * Class LiteralsTest.
@@ -35,17 +33,6 @@ class LiteralsTest extends TestCase
     private $nodeLiterals;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe check arguments of this constructor. */
-        $this->nodeLiterals = $this->getMockBuilder(Literals::class)
-            ->setConstructorArgs(["|-", 42])
-            ->getMockForAbstractClass();
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Literals::__construct
      */
     public function testConstruct(): void
@@ -53,7 +40,7 @@ class LiteralsTest extends TestCase
         $this->nodeLiterals = $this->getMockBuilder(Literals::class)
             ->setConstructorArgs(["|", 42])
             ->getMockForAbstractClass();
-        $reflector = new \ReflectionClass($this->nodeLiterals);
+        $reflector = new ReflectionClass($this->nodeLiterals);
         $identifier = $reflector->getProperty('identifier');
         $identifier->setAccessible(true);
         $this->assertEquals(null, $identifier->getValue($this->nodeLiterals));
@@ -100,7 +87,7 @@ class LiteralsTest extends TestCase
     {
         $list = new NodeList(new Blank('', 1));
         $list->push(new Blank('', 2));
-        $stripLeading = new \ReflectionMethod(Literals::class, 'litteralStripLeading');
+        $stripLeading = new ReflectionMethod(Literals::class, 'litteralStripLeading');
         $stripLeading->setAccessible(true);
         $stripLeading->invokeArgs(null, [&$list]);
         $this->assertEquals(0, $list->count());
@@ -113,7 +100,7 @@ class LiteralsTest extends TestCase
     {
         $list = new NodeList(new Blank('', 1));
         $list->push(new Blank('', 2));
-        $stripTrailing = new \ReflectionMethod(Literals::class, 'litteralStripTrailing');
+        $stripTrailing = new ReflectionMethod(Literals::class, 'litteralStripTrailing');
         $stripTrailing->setAccessible(true);
         $stripTrailing->invokeArgs(null, [&$list]);
         $this->assertEquals(0, $list->count());
@@ -160,12 +147,12 @@ class LiteralsTest extends TestCase
      */
     public function testGetChildValue(): void
     {
-        $getChildValue = new \ReflectionMethod($this->nodeLiterals, 'getChildValue');
+        $getChildValue = new ReflectionMethod($this->nodeLiterals, 'getChildValue');
         $getChildValue->setAccessible(true);
         $nodeQuoted = new Quoted('    "sometext"', 1);
         $nodeScalar = new Scalar('    sometext', 1);
-        $nodeItem   = new Comment('    -  itemtext', 1);
-        $nodeKey    = new Blank('    key: somevalue', 1);
+        $nodeItem = new Comment('    -  itemtext', 1);
+        $nodeKey = new Blank('    key: somevalue', 1);
         //
         $scalarResult = $getChildValue->invokeArgs($this->nodeLiterals, [$nodeScalar, 4]);
         $this->assertEquals('sometext', $scalarResult);
@@ -187,5 +174,16 @@ class LiteralsTest extends TestCase
     {
         $uselessNode = new Blank('', 1);
         $this->assertTrue($this->nodeLiterals->isAwaitingChild($uselessNode));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe check arguments of this constructor. */
+        $this->nodeLiterals = $this->getMockBuilder(Literals::class)
+            ->setConstructorArgs(["|-", 42])
+            ->getMockForAbstractClass();
     }
 }

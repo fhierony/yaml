@@ -2,15 +2,12 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
-use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Partial;
 use Dallgoot\Yaml\Nodes\Quoted;
 use Dallgoot\Yaml\Nodes\Scalar;
+use ParseError;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class PartialTest.
@@ -30,20 +27,12 @@ class PartialTest extends TestCase
     private $nodePartial;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->nodePartial = new Partial(' " partially quoted');
-    }
-
-    /**
      * @covers \Dallgoot\Yaml\Nodes\Partial::specialProcess
      */
     public function testSpecialProcess(): void
     {
         $blankBuffer = [];
-        $node   = new Scalar(' end of quoting"', 2);
+        $node = new Scalar(' end of quoting"', 2);
         $parent = new Scalar(' emptykey:', 1);
         $parent->add($this->nodePartial);
         $this->assertTrue($this->nodePartial->specialProcess($node, $blankBuffer));
@@ -58,7 +47,7 @@ class PartialTest extends TestCase
     {
         $this->nodePartial = new Partial(" ' partially quoted\n");
         $blankBuffer = [];
-        $node   = new Scalar(" end of quoting'", 2);
+        $node = new Scalar(" end of quoting'", 2);
         $parent = new Scalar(' emptykey:', 1);
         $parent->add($this->nodePartial);
         $this->assertTrue($this->nodePartial->specialProcess($node, $blankBuffer));
@@ -74,7 +63,7 @@ class PartialTest extends TestCase
     {
         $blankBuffer = [];
         $current = new Blank('', 2);
-        $parent  = new Scalar(' emptykey:', 1);
+        $parent = new Scalar(' emptykey:', 1);
         $parent->add($this->nodePartial);
         $this->assertTrue($this->nodePartial->specialProcess($current, $blankBuffer));
         $this->assertTrue($parent->value instanceof Partial);
@@ -86,7 +75,15 @@ class PartialTest extends TestCase
      */
     public function testBuild(): void
     {
-        $this->expectException(\ParseError::class);
+        $this->expectException(ParseError::class);
         $this->nodePartial->build();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->nodePartial = new Partial(' " partially quoted');
     }
 }

@@ -2,15 +2,12 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Literal;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Class BlankTest.
@@ -28,15 +25,6 @@ class BlankTest extends TestCase
      * @var Blank $nodeBlank An instance of "Nodes\Blank" to test.
      */
     private $nodeBlank;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        /** @todo Maybe add some arguments to this constructor */
-        $this->nodeBlank = new Blank('', 1);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\Blank::add
@@ -60,7 +48,7 @@ class BlankTest extends TestCase
     {
         $blankBuffer = [];
         $previousScalarParent = new Literal('|-', 1);
-        $previousScalar       = new Scalar('    sometext', 2);
+        $previousScalar = new Scalar('    sometext', 2);
         $previousScalarParent->add($previousScalar);
         $this->assertTrue($this->nodeBlank->specialProcess($previousScalar, $blankBuffer));
         $this->assertEquals($this->nodeBlank, $blankBuffer[0]);
@@ -102,5 +90,15 @@ class BlankTest extends TestCase
         $blankBuffer = [];
         $keyNode = new Key(' somelit: |', 1);
         $keyNode->add($this->nodeBlank);
-        $this->assertEquals($this->nodeBlank->getTargetOnMoreIndent($uselessNode), $keyNode);    }
+        $this->assertEquals($this->nodeBlank->getTargetOnMoreIndent($uselessNode), $keyNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        /** @todo Maybe add some arguments to this constructor */
+        $this->nodeBlank = new Blank('', 1);
+    }
 }

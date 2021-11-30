@@ -2,6 +2,9 @@
 
 namespace Dallgoot\Yaml\Nodes;
 
+use ParseError;
+use Throwable;
+
 /**
  *
  * @author  Stéphane Rebai <stephane.rebai@gmail.com>
@@ -17,8 +20,8 @@ class Anchor extends Actions
         if ($this->anchor[0] === "*") {
             try {
                 return $yamlObject->getReference($name);
-            } catch (\Throwable $e) {
-                throw new \ParseError("Unknown anchor : '$name' this:".$this->anchor,1,$e);
+            } catch (Throwable $e) {
+                throw new ParseError("Unknown anchor : '$name' this:" . $this->anchor, 1, $e);
             }
         } else {
             $built = is_null($this->value) ? null : $this->value->build($parent);
@@ -26,7 +29,7 @@ class Anchor extends Actions
         }
     }
 
-    public function isAwaitingChild(NodeGeneric $node):bool
+    public function isAwaitingChild(NodeGeneric $node): bool
     {
         return is_null($this->value);
     }

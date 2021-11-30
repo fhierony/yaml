@@ -2,16 +2,15 @@
 
 namespace Test\Dallgoot\Yaml\Nodes;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-
 use Dallgoot\Yaml\NodeList;
-use Dallgoot\Yaml\Nodes\NodeGeneric;
 use Dallgoot\Yaml\Nodes\Blank;
 use Dallgoot\Yaml\Nodes\Comment;
 use Dallgoot\Yaml\Nodes\Key;
 use Dallgoot\Yaml\Nodes\Literal;
 use Dallgoot\Yaml\Nodes\Scalar;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use const INF;
 
 /**
  * Class ScalarTest.
@@ -29,14 +28,6 @@ class ScalarTest extends TestCase
      * @var Scalar $nodeScalar An instance of "Nodes\Scalar" to test.
      */
     private $nodeScalar;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
-    {
-        $this->nodeScalar = new Scalar("a string to test", 42);
-    }
 
     /**
      * @covers \Dallgoot\Yaml\Nodes\Scalar::__construct
@@ -67,7 +58,7 @@ class ScalarTest extends TestCase
         $this->assertEquals(123, $this->nodeScalar->build());
     }
 
-        /**
+    /**
      * @covers \Dallgoot\Yaml\Nodes\Scalar::build
      */
     public function testBuildTagged(): void
@@ -106,18 +97,18 @@ class ScalarTest extends TestCase
         $this->assertEquals($parent, $this->nodeScalar->getTargetOnMoreIndent($parent));
     }
 
-        /**
+    /**
      * @covers \Dallgoot\Yaml\Nodes\Scalar::getScalar
      */
     public function testGetScalar(): void
     {
-        $this->assertEquals($this->nodeScalar->getScalar('yes')  , true);
-        $this->assertEquals($this->nodeScalar->getScalar('no')   , false);
-        $this->assertEquals($this->nodeScalar->getScalar('true') , true);
+        $this->assertEquals($this->nodeScalar->getScalar('yes'), true);
+        $this->assertEquals($this->nodeScalar->getScalar('no'), false);
+        $this->assertEquals($this->nodeScalar->getScalar('true'), true);
         $this->assertEquals($this->nodeScalar->getScalar('false'), false);
-        $this->assertEquals($this->nodeScalar->getScalar('null') , null);
-        $this->assertEquals($this->nodeScalar->getScalar('.inf') , \INF);
-        $this->assertEquals($this->nodeScalar->getScalar('-.inf'), -\INF);
+        $this->assertEquals($this->nodeScalar->getScalar('null'), null);
+        $this->assertEquals($this->nodeScalar->getScalar('.inf'), INF);
+        $this->assertEquals($this->nodeScalar->getScalar('-.inf'), -INF);
         $this->assertTrue(is_nan($this->nodeScalar->getScalar('.nan')));
     }
 
@@ -126,7 +117,7 @@ class ScalarTest extends TestCase
      */
     public function testGetNumber(): void
     {
-        $reflector = new \ReflectionClass($this->nodeScalar);
+        $reflector = new ReflectionClass($this->nodeScalar);
         $method = $reflector->getMethod('getNumber');
         $method->setAccessible(true);
         $this->assertTrue(is_numeric($method->invoke($this->nodeScalar, '132')));
@@ -134,5 +125,13 @@ class ScalarTest extends TestCase
         $this->assertTrue(is_numeric($method->invoke($this->nodeScalar, '0xaf')));
         $this->assertTrue(is_float($method->invoke($this->nodeScalar, '132.123')));
         $this->assertFalse(is_float($method->invoke($this->nodeScalar, '132.12.3')));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->nodeScalar = new Scalar("a string to test", 42);
     }
 }
